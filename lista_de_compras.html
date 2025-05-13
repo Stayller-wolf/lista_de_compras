@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de compras da minha rainha</title>
+    <link rel="icon" href="assets/coroa rosa.png">
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f8bbd0; /* Rosa claro para o fundo */
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #880e4f; /* Roxo escuro para o título */
+        }
+
+        .input-group {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #e91e63; /* Rosa mais forte para o botão adicionar */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 5px; /* Adicionado margem para separar os botões */
+        }
+
+        button:hover {
+            background-color: #d81b60;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px; /* Adicionado margem abaixo da lista */
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        li span {
+            flex-grow: 1;
+            font-size: 16px;
+        }
+
+        .delete-btn {
+            background-color: #9c27b0; /* Roxo para o botão de deletar */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .delete-btn:hover {
+            background-color: #8e24aa;
+        }
+
+        .checked {
+            text-decoration: line-through;
+            color: #777;
+        }
+
+        #finishButton {
+            background-color: #4caf50; /* Verde para o botão de finalizar */
+        }
+
+        #finishButton:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Minha Lista de Compras</h1>
+        <div class="input-group">
+            <input type="text" id="newItem" placeholder="Adicionar item">
+            <button onclick="addItem()">Adicionar</button>
+        </div>
+        <ul id="shoppingList">
+            </ul>
+        <button id="finishButton" onclick="sendToWhatsApp()">Finalizar e Enviar para WhatsApp</button>
+    </div>
+
+    <script>
+        const newItemInput = document.getElementById('newItem');
+        const shoppingList = document.getElementById('shoppingList');
+        const finishButton = document.getElementById('finishButton');
+
+        const numeroWhatsApp = "5524999861706"; // Substitua pelo número desejado (ex: 5521999999999)
+
+        // Lista de itens predefinidos
+        const initialItems = ["Arroz", "Leite", "Feijão", "Suco"];
+
+        // Função para adicionar um item à lista na interface
+        function appendItemToList(itemName) {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <span>${itemName}</span>
+                <button class="delete-btn" onclick="removeItem(this)">Remover</button>
+            `;
+            shoppingList.appendChild(listItem);
+        }
+
+        // Adiciona os itens predefinidos à lista ao carregar a página
+        initialItems.forEach(item => {
+            appendItemToList(item);
+        });
+
+        function addItem() {
+            const itemName = newItemInput.value.trim();
+            if (itemName !== "") {
+                appendItemToList(itemName);
+                newItemInput.value = ""; // Limpa o campo de entrada
+            }
+        }
+
+        function removeItem(button) {
+            const listItem = button.parentNode;
+            shoppingList.removeChild(listItem);
+        }
+
+        shoppingList.addEventListener('click', function(event) {
+            if (event.target.tagName === 'SPAN') {
+                event.target.classList.toggle('checked');
+            }
+        });
+
+        newItemInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addItem();
+            }
+        });
+
+        function sendToWhatsApp() {
+            const items = shoppingList.querySelectorAll('span');
+            let message = "Lista de Compras:\n";
+            items.forEach(item => {
+                // Se o item estiver riscado, indica que foi comprado
+                if (item.classList.contains('checked')) {
+                    message += "✅ " + item.textContent + " (Comprado)\n";
+                } else {
+                    message += "🛍️ " + item.textContent + "\n";
+                }
+            });
+
+            // Formata a mensagem para URL encoding
+            const encodedMessage = encodeURIComponent(message);
+
+            // Cria o link do WhatsApp
+            const whatsappLink = `https://wa.me/${numeroWhatsApp}?text=${encodedMessage}`;
+            // Abre o link em uma nova janela
+            window.open(whatsappLink, '_blank');
+        }
+    </script>
+</body>
+</html>
